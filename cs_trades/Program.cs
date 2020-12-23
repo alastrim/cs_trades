@@ -15,7 +15,7 @@ namespace cs_trades
             string SECBOARD,
             string SECCODE,
             double PRICE,
-            int VOLUME,
+            long VOLUME,
             double ACCRUEDINT,
             double YIELD,
             double VALUE)
@@ -43,7 +43,7 @@ namespace cs_trades
         string m_SECBOARD { get; }
         string m_SECCODE { get; }
         double m_PRICE { get; }
-        int m_VOLUME { get; }
+        long m_VOLUME { get; }
         double m_ACCRUEDINT { get; }
         double m_YIELD { get; }
         double m_VALUE { get; }
@@ -72,7 +72,7 @@ namespace cs_trades
                         string SECBOARD = parts[i++];
                         string SECCODE = parts[i++];
                         double PRICE = double.Parse (parts[i++], CultureInfo.InvariantCulture);
-                        int VOLUME = int.Parse (parts[i++]);
+                        long VOLUME = long.Parse (parts[i++]);
                         double ACCRUEDINT = double.Parse (parts[i++], CultureInfo.InvariantCulture);
                         double YIELD = double.Parse (parts[i++], CultureInfo.InvariantCulture);
                         double VALUE = double.Parse (parts[i++], CultureInfo.InvariantCulture);
@@ -92,7 +92,7 @@ namespace cs_trades
 
         static void Main (string[] args)
         {
-            string path = "C:\\Users\\User\\Desktop\\short.txt";
+            string path = "C:\\Users\\User\\Desktop\\trades.txt";
             List<TradeInfo> trades = get_all_trades (path);
 
             foreach (var tr in trades)
