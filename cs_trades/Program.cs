@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Globalization;
+using System.Linq;
 
 namespace cs_trades
 {
@@ -38,15 +39,15 @@ namespace cs_trades
             Console.WriteLine ();
         }
 
-        long m_TRADENO { get; }
-        string m_TRADETIME { get; }
-        string m_SECBOARD { get; }
-        string m_SECCODE { get; }
-        double m_PRICE { get; }
-        long m_VOLUME { get; }
-        double m_ACCRUEDINT { get; }
-        double m_YIELD { get; }
-        double m_VALUE { get; }
+        public long m_TRADENO { get; }
+        public string m_TRADETIME { get; }
+        public string m_SECBOARD { get; }
+        public string m_SECCODE { get; }
+        public double m_PRICE { get; }
+        public long m_VOLUME { get; }
+        public double m_ACCRUEDINT { get; }
+        public double m_YIELD { get; }
+        public double m_VALUE { get; }
     }
 
     class Program
@@ -90,13 +91,40 @@ namespace cs_trades
             }
         }
 
+        static void describe_group (IGrouping<string, TradeInfo> sg)
+        {
+            double percentchange = Math.Round ((sg.Last ().m_PRICE - sg.First ().m_PRICE) / sg.First ().m_PRICE * 100, 2);
+            double fullsum = sg.Sum (s => { return s.m_VALUE; });
+
+            Console.WriteLine ("Seccode: {0}", sg.First ().m_SECCODE);
+            Console.WriteLine ("Price change: {0}%", percentchange);
+            Console.WriteLine ("Total sum: {0}", fullsum);
+
+            Console.WriteLine ();
+        }
+
         static void Main (string[] args)
         {
             string path = "C:\\Users\\User\\Desktop\\trades.txt";
             List<TradeInfo> trades = get_all_trades (path);
 
-            foreach (var tr in trades)
-                tr.print ();
+            var query1 = trades.Where (s => (s.m_SECBOARD == "TQBR" || s.m_SECBOARD == "FQBR"));
+
+            var query2 = from s in query1
+                         group s by s.m_SECCODE into sg
+                         orderby (sg.Last ().m_PRICE - sg.First ().m_PRICE) / sg.First ().m_PRICE
+                         select sg;
+
+            var top10worst = query2.Take (10);
+            var top10best = query2.Reverse ().Take (10);
+
+            Console.WriteLine ("Top 10 best:");
+            foreach (var sg in top10best)
+                describe_group (sg);
+
+            Console.WriteLine ("Top 10 worst:");
+            foreach (var sg in top10worst)
+                describe_group (sg);
         }
     }
 }
